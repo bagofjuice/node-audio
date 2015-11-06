@@ -4,21 +4,21 @@ var PORT = 3000;
 var Player = require( 'player' );
 var http = require( 'http' );
 
-var mp3File =  './mp3/monster_roar.mp3';
-var player = new Player( mp3File );
 var playingAudio = false;
+var files = [
+	'devil_dog',
+	'help_me',
+	'manic_witches',
+	'monster_roar',
+	'terror_scream'
+];
 
-player.on( 'error', function(){
+function getMp3File(){
 
-	console.log( 'Error from player!' );
-	playingAudio = false;
-} );
+	var index = Math.floor( Math.random() * files.length );
 
-player.on( 'playend', function(){
-
-	console.log( 'Audio finished playing.' );
-	playingAudio = false;
-} );
+	return './mp3/' + files[ index ] + '.mp3';
+}
 
 var server = http.createServer( function( req, res ){
 
@@ -34,12 +34,28 @@ var server = http.createServer( function( req, res ){
 		} else {
 
 			console.log( 'Starting audio...' );
+				
+			var mp3File =  getMp3File();
+
+			var player = new Player( mp3File );
+
+			player.on( 'error', function(){
+
+				console.log( 'Error from player!' );
+				playingAudio = false;
+			} );
+
+			player.on( 'playend', function(){
+
+				console.log( 'Audio finished playing.' );
+				playingAudio = false;
+			} );
 
 			player.play();
 			playingAudio = true;
 
 			res.statusCode = 200;
-			res.end( 'Playing audio' );
+			res.end( 'Playing audio ' + mp3File );
 		}
 
 	} else if( req.url === '/stop/' ){
