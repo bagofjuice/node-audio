@@ -1,21 +1,21 @@
 {
   "name": "node-audio",
-  "version": "0.0.0",
-  "description": "Play audio file(s)\"",
+  "version": "0.0.1",
+  "description": "Initiate local playback of a local MP3 audio file through HTTP GET command",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/web-bert/node-audio.git"
+    "url": "https://github.com/bagofjuice/node-audio.git"
   },
-  "author": "Graham Veal",
+  "author": "Vikash Chauhan",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/web-bert/node-audio/issues"
+    "url": "https://github.com/bagofjuice/node-audio/issues"
   },
-  "homepage": "https://github.com/web-bert/node-audio",
+  "homepage": "https://github.com/bagofjuice/node-audio",
   "dependencies": {
     "player": "^0.6.1"
   }

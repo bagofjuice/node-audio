@@ -1,89 +1,79 @@
+var PORT = 3000,
+	Player = require('player'),
+	http = require('http'),
+	playingAudio = false,
+	player;
 
-var PORT = 3000;
+var URL_PLAY = '/play',
+	URL_STOP = '/stop';
 
-var Player = require( 'player' );
-var http = require( 'http' );
-
-var playingAudio = false;
-var files = [
-	'devil_dog',
-	'help_me',
-	'manic_witches',
-	'monster_roar',
-	'terror_scream'
-];
-
-function getMp3File(){
-
-	var index = Math.floor( Math.random() * files.length );
-
-	return './mp3/' + files[ index ] + '.mp3';
+function getAudioFileName() {
+	var filename = 'siren1.mp3';
+	return './mp3/' + filename;
 }
 
-var server = http.createServer( function( req, res ){
+function playAudio(res) {
+	if (playingAudio) {
+		res.statusCode = 202;
+		res.end('Audio in progress');
+	} else {
+		console.log('Starting audio...');
 
-	console.log( 'Request received for path: %s', req.url );
+		var filename = getAudioFileName();
 
-	if( req.url === '/play/' ){
+		player = new Player(filename);
 
-		if( playingAudio ){
-
-			res.statusCode = 202;
-			res.end( 'Audio in progress' );
-
-		} else {
-
-			console.log( 'Starting audio...' );
-				
-			var mp3File =  getMp3File();
-
-			var player = new Player( mp3File );
-
-			player.on( 'error', function(){
-
-				console.log( 'Error from player!' );
-				playingAudio = false;
-			} );
-
-			player.on( 'playend', function(){
-
-				console.log( 'Audio finished playing.' );
-				playingAudio = false;
-			} );
-
-			player.play();
-			playingAudio = true;
-
-			res.statusCode = 200;
-			res.end( 'Playing audio ' + mp3File );
-		}
-
-	} else if( req.url === '/stop/' ){
-
-		if( playingAudio ){
-
-			console.log( 'Stopping audio...' );
-
-			player.stop();
+		player.on('error', function () {
+			console.log('Error from player!');
 			playingAudio = false;
+		});
 
-			res.statusCode = 200;
-			res.end( 'Audio stopped' );
+		player.on('playend', function () {
+			console.log('Audio finished playing.');
+			playingAudio = false;
+		});
 
-		} else {
+		player.play();
+		playingAudio = true;
 
-			res.statusCode = 501;
-			res.end( 'No audio in progress' );
-		}
+		res.statusCode = 200;
+		res.end('Playing audio ' + filename);
+	}
+}
+
+function stopAudio(res) {
+	if (playingAudio) {
+		console.log('Stopping audio...');
+
+		player.stop();
+		playingAudio = false;
+
+		res.statusCode = 200;
+		res.end('Audio stopped');
 
 	} else {
-
-		res.statusCode = 404;
-		res.end();
+		res.statusCode = 501;
+		res.end('No audio in progress');
 	}
-} );
+}
 
-server.listen( PORT, function(){
+var server = http.createServer(function (req, res) {
+	console.log('Request received for path: %s', req.url);
 
-	console.log( 'Server listening on %s', PORT );
-} );
+	switch (req.url) {
+		case URL_PLAY:
+			playAudio(res);
+			break;
+		case URL_STOP:
+			stopAudio(res);
+			break;
+		default:
+			res.statusCode = 404;
+			res.end();
+			break;
+	}
+});
+
+server.listen(PORT, function () {
+	console.log('Server listening on %s', PORT);
+});
