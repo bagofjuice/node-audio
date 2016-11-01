@@ -1,4 +1,4 @@
-var PORT = 3000,
+var PORT = 8092,
 	Player = require('player'),
 	http = require('http'),
 	playingAudio = false,
